@@ -1,4 +1,17 @@
 == Version History ==
+
+x.x ----------
+Added support to exclude Paths via regex expression
+
+Example: (Web.config)
+
+<excludedPaths>
+              <add type="Regex" path="foo/bar[1234]/" />
+</excludedPaths>
+
+- Updated project to vs2010
+
+
 6.0, V2 -----
   Changes:
     - Compiled against v2 of the .NET framework, using the framework supplied GZip

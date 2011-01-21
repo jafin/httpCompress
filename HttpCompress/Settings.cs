@@ -1,6 +1,7 @@
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Text.RegularExpressions;
 using System.Xml;
 
 namespace blowery.Web.HttpCompress {
@@ -13,6 +14,7 @@ namespace blowery.Web.HttpCompress {
     private CompressionLevels _compressionLevel;
     private StringCollection _excludedTypes;
     private StringCollection _excludedPaths;
+    private List<Regex> _excludedPathsRegex;
 
     /// <summary>
     /// Create an HttpCompressionModuleSettings from an XmlNode
@@ -29,6 +31,7 @@ namespace blowery.Web.HttpCompress {
       _excludedTypes = new StringCollection();
       _excludedPaths = new StringCollection();
       _excludedPaths.Add(".axd");
+      _excludedPathsRegex = new List<Regex>();
     }
 
     /// <summary>
@@ -109,7 +112,18 @@ namespace blowery.Web.HttpCompress {
     /// <param name="relUrl">the relative url to check</param>
     /// <returns>true if excluded, false if not</returns>
     public bool IsExcludedPath(string relUrl) {
-      return _excludedPaths.Contains(relUrl.ToLower());
+        bool stringMatch = _excludedPaths.Contains(relUrl.ToLower());
+        bool regexMatch = false;
+        foreach(var exp in _excludedPathsRegex)
+        {
+            bool isMatch = exp.IsMatch(relUrl);
+            if (isMatch)
+            {
+                regexMatch = true;
+                break;
+            }
+        }
+        return (stringMatch || regexMatch);
     }
 
     private void ParseExcludedTypes(XmlNode node) {
@@ -129,18 +143,62 @@ namespace blowery.Web.HttpCompress {
       }
     }
 
+      /// <summary>
+      /// Gets the type of exclusion, either String (default) or regex.
+      /// </summary>
+      /// <param name="node"></param>
+      /// <returns></returns>
+    private ExcludePathExpressionType GetExcludePathExpressionType(XmlNode node)
+    {
+        ExcludePathExpressionType expressionType = ExcludePathExpressionType.String;
+        string type = String.Empty;
+        if (node.Attributes != null && node.Attributes["type"] != null)
+        {
+            type = node.Attributes["type"].Value.ToLower();
+            try
+            {
+                expressionType = (ExcludePathExpressionType) Enum.Parse(typeof (ExcludePathExpressionType), type, true);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        return expressionType;
+    }
+
     private void ParseExcludedPaths(XmlNode node) {
       if(node == null) return;
 
-      for(int i = 0; i < node.ChildNodes.Count; ++i) {
+      for(int i = 0; i < node.ChildNodes.Count; ++i)
+      {
+        var excludePathExpressionType = GetExcludePathExpressionType(node.ChildNodes[i]);
         switch(node.ChildNodes[i].LocalName) {
           case "add":
-            if(node.ChildNodes[i].Attributes["path"] != null) 
-              _excludedPaths.Add(node.ChildNodes[i].Attributes["path"].Value.ToLower());
+            if(node.ChildNodes[i].Attributes["path"] != null)
+            {
+                if (excludePathExpressionType == ExcludePathExpressionType.Regex)
+                {
+                    _excludedPathsRegex.Add(new Regex(node.ChildNodes[i].Attributes["path"].Value));
+                }
+                else
+                {
+                    _excludedPaths.Add(node.ChildNodes[i].Attributes["path"].Value.ToLower());    
+                }
+            }
             break;
           case "delete":
             if(node.ChildNodes[i].Attributes["path"] != null)
-              _excludedPaths.Remove(node.ChildNodes[i].Attributes["path"].Value.ToLower());
+            {
+                if (excludePathExpressionType == ExcludePathExpressionType.Regex)
+                {
+                    _excludedPathsRegex.Remove(new Regex(node.ChildNodes[i].Attributes["path"].Value));
+                }
+                else
+                {
+                    _excludedPaths.Remove(node.ChildNodes[i].Attributes["path"].Value.ToLower());    
+                }
+            }
             break;
         }
       }
