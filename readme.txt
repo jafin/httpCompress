@@ -1,6 +1,9 @@
-== Version History ==
+Version History
+===============
 
-x.x ----------
+
+x.x
+---
 Added support to exclude Paths via regex expression
 
 Example: (Web.config)
@@ -12,24 +15,21 @@ Example: (Web.config)
 - Updated project to vs2010
 
 
-6.0, V2 -----
-  Changes:
-    - Compiled against v2 of the .NET framework, using the framework supplied GZip
-      and Deflate streams.  This rev requires .NET2 and does not use #ziplib.
+6.0, V2 
+-------
+### Changes: ###
+- Compiled against v2 of the .NET framework, using the framework supplied GZip and Deflate streams.  This rev requires .NET2 and does not use #ziplib.
       
-6.0 ---------
-  Changes:
-    - I now delay the insertion of the compression header until the first
-      write is attempted on the compressing stream.  This allows exceptions
-      to be written properly, though they will be written uncompressed.  
-    - The same fix should allow Server.Transfer and friends to work without
-      modification, though the contents of pages written using Server.Transfer
-      will not be compressed.
-    - Thanks to Milan Negovan for helping me track down this issue and thanks
-      to the shower for helping me come up with a general solution.
+6.0 
+---------
+###  Changes: ###
+- I now delay the insertion of the compression header until the first write is attempted on the compressing stream.  This allows exceptions to be written properly, though they will be written uncompressed.  
+- The same fix should allow Server.Transfer and friends to work without modification, though the contents of pages written using Server.Transfer will not be compressed.
+- Thanks to Milan Negovan for helping me track down this issue and thanks to the shower for helping me come up with a general solution.
 
-5.0.0.0 -----
-  Changes:
+5.0.0.0 
+---------
+###  Changes: ###
     - All these came from outside sources.  No real work from me.
     - Added support for the VaryByHeader, thanks to Simon Fell and Ian Anderson
     - Reworked the filter picker (all thanks to Ian Anderson)
@@ -37,8 +37,9 @@ Example: (Web.config)
       - Fixed a bug where the INSTALLED_TAG was not being set into the 
         Context properly if compression was determined unnecessary.
 
-4.0.0.0 -----
-  Changes:
+4.0.0.0 
+---------
+### Changes: ###
     - upped to version 4.  From now on, every release will be a major 
       version release.
     - now have support for path-based and ContentType-based exlusions
@@ -55,15 +56,16 @@ Example: (Web.config)
     
 
 
-1.1 ---------
+1.1
+---------
 
-  MAJOR CHANGES THAT WILL AFFECT YOU
+### MAJOR CHANGES THAT WILL AFFECT YOU ###
     - the assembly is now named HttpCompressionModule.dll
     - the config section handler is now HttpCompressionModuleSectionHandler
     - YOU WILL NEED TO UPDATE YOUR CONFIG FILES
       FOR THIS VERSION TO WORK (see samples for direction)
   
-  Other stuff
+### Other stuff ###
     - moved to SharpZipLib (formerly NZipLib) 0.31 which
       contains a bunch of bug fixes.  This means I just
       inherited a bunch of bug fixes.  yay!
@@ -81,10 +83,13 @@ Example: (Web.config)
     - added examples.  
     
 
-1.0 ---------
+1.0 
+---------
   - initial introduction
 
-=== Introduction ==
+Introduction
+============
+
 Hey there,
 
 Thanks for downloading my compressing filter for ASP.NET!  As
@@ -100,11 +105,11 @@ see the provided example.  It shows what entries have
 to be added to the web.config to set things up.
 
 So, to get things going, here's what you have to do:
-1) compile the project into a library (or just use the
+1. compile the project into a library (or just use the
      version in /lib)
-2) move the .dll that comes from compilation to the /bin directory of
+2. move the .dll that comes from compilation to the /bin directory of
    your asp.net web app
-3) add the entries to the web.config of your asp.net app
+3. add the entries to the web.config of your asp.net app
 
 That's it.  That should get you going.
 
